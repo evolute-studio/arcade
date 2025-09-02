@@ -9,7 +9,7 @@ const config = {
   presets: [cartridgeTWPreset],
   theme: {
     screens: {
-      lg: "1160px",
+      lg: "1200px",
     },
     extend: {
       width: {

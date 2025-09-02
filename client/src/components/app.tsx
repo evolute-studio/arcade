@@ -10,13 +10,16 @@ import { useProject } from "@/hooks/project";
 import { ThemeProvider } from "@/context/theme";
 import { useArcade } from "@/hooks/arcade";
 import { useDevice } from "@/hooks/device";
+import { MarketPage } from "./pages/market";
+import { Filters } from "./filters";
+import { UserCard } from "./user/user-card";
 
 export function App() {
   const { isOpen, toggle, handleTouchMove, handleTouchStart } = useSidebar();
   const { setPlayer } = useArcade();
-  const { player } = useProject();
+  const { player, collection } = useProject();
 
-  const isPWA = useDevice();
+  const { isPWA, isMobile } = useDevice();
 
   useEffect(() => {
     setPlayer(player);
@@ -31,7 +34,7 @@ export function App() {
         >
           <div
             className={cn(
-              "lg:w-[1112px] lg:pb-6 gap-3 lg:gap-8 flex items-stretch m-auto h-full overflow-clip",
+              "lg:w-[1192px] lg:pb-6 gap-3 lg:gap-8 flex items-stretch m-auto h-full overflow-clip",
               "transition-all duration-300 ease-in-out",
             )}
           >
@@ -44,7 +47,12 @@ export function App() {
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
             />
-            <Games />
+
+            <div className="lg:space-y-4">
+              {!isMobile && <UserCard />}
+              {!collection ? <Games /> : <Filters />}
+            </div>
+
             <div
               className={cn(
                 "fixed lg:relative h-full w-full flex flex-col overflow-hidden px-3 lg:px-0 lg:pb-0",
@@ -62,12 +70,20 @@ export function App() {
               </div>
               <div
                 className={cn(
-                  "relative grow h-full flex flex-col rounded-xl lg:gap-3 overflow-hidden border border-background-200 bg-background-100",
+                  "relative grow h-full flex flex-col rounded-xl lg:gap-3 overflow-hidden border border-background-200 bg-background-100 lg:w-[800px]",
                   player &&
                     "bg-background-125 shadow-[0px_0px_8px_0px_rgba(15,20,16,_0.50)]",
                 )}
               >
-                {!player ? <GamePage /> : <PlayerPage />}
+                {!player ? (
+                  !collection ? (
+                    <GamePage />
+                  ) : (
+                    <MarketPage />
+                  )
+                ) : (
+                  <PlayerPage />
+                )}
               </div>
             </div>
           </div>

@@ -9,6 +9,7 @@ import {
   ListIcon,
   MetricsIcon,
   PulseIcon,
+  ScrollIcon,
   Select,
   SelectContent,
   ShoppingCartIcon,
@@ -17,11 +18,13 @@ import {
   TabsList,
   TabsTrigger,
   TrophyIcon,
-  useMediaQuery,
+  UsersIcon,
+  LightbulbIcon,
 } from "@cartridge/ui";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 import ArcadeTab from "./tab";
+import { useDevice } from "@/hooks/device";
 
 const arcadeTabsVariants = cva(
   "flex justify-start items-end w-full p-0 px-4 border-b rounded-none",
@@ -50,7 +53,11 @@ export type TabValue =
   | "activity"
   | "metrics"
   | "about"
-  | "marketplace";
+  | "marketplace"
+  | "items"
+  | "holders"
+  | "predict"
+  | "positions";
 
 export interface ArcadeTabsProps
   extends React.HTMLAttributes<HTMLDivElement>,
@@ -70,7 +77,10 @@ export const ArcadeTabs = ({
     "marketplace",
     "inventory",
     "achievements",
+    "positions",
     "guilds",
+    "items",
+    "holders",
   ],
   onTabClick,
   variant,
@@ -87,8 +97,7 @@ export const ArcadeTabs = ({
     new Map<TabValue, { width: number; visible: boolean }>(),
   );
 
-  const isMobile = useMediaQuery("(max-width: 1024px)");
-  const isPWA = useMediaQuery("(display-mode: standalone)");
+  const { isMobile, isPWA } = useDevice();
 
   useEffect(() => {
     if (isMobile) return;
@@ -280,6 +289,14 @@ const Tab = ({
       return <AboutNavButton key={tab} {...props} />;
     case "marketplace":
       return <MarketplaceNavButton key={tab} {...props} />;
+    case "items":
+      return <ItemsNavButton key={tab} {...props} />;
+    case "holders":
+      return <HoldersNavButton key={tab} {...props} />;
+    case "predict":
+      return <PredictNavButton key={tab} {...props} />;
+    case "positions":
+      return <PositionsNavButton {...props} />;
     default:
       return null;
   }
@@ -648,5 +665,181 @@ const MarketplaceNavButton = React.forwardRef<
     />
   );
 });
+
+const ItemsNavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(
+  ({ value, active, size, onClick, item, isMobile }, ref) => {
+    if (isMobile) {
+      return (
+        <TabsTrigger
+          className="p-0 grow data-[state=active]:bg-background-transparent data-[state=active]:shadow-none"
+          value={value}
+          ref={ref}
+        >
+          <BottomTab status={active ? "active" : null} onClick={onClick}>
+            <ScrollIcon variant="solid" size="lg" />
+          </BottomTab>
+        </TabsTrigger>
+      );
+    }
+
+    if (item) {
+      return (
+        <ArcadeMenuItem
+          ref={ref}
+          value={value}
+          Icon={<ScrollIcon variant="solid" size="sm" />}
+          label="Items"
+          active={active}
+          size={size}
+          onClick={onClick}
+        />
+      );
+    }
+
+    return (
+      <ArcadeTab
+        ref={ref}
+        value={value}
+        Icon={<ScrollIcon variant="solid" size="sm" />}
+        label="Items"
+        active={active}
+        size={size}
+        onClick={onClick}
+      />
+    );
+  },
+);
+
+const HoldersNavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(
+  ({ value, active, size, onClick, item, isMobile }, ref) => {
+    if (isMobile) {
+      return (
+        <TabsTrigger
+          className="p-0 grow data-[state=active]:bg-background-transparent data-[state=active]:shadow-none"
+          value={value}
+          ref={ref}
+        >
+          <BottomTab status={active ? "active" : null} onClick={onClick}>
+            <UsersIcon variant="solid" size="lg" />
+          </BottomTab>
+        </TabsTrigger>
+      );
+    }
+
+    if (item) {
+      return (
+        <ArcadeMenuItem
+          ref={ref}
+          value={value}
+          Icon={<UsersIcon variant="solid" size="sm" />}
+          label="Holders"
+          active={active}
+          size={size}
+          onClick={onClick}
+        />
+      );
+    }
+
+    return (
+      <ArcadeTab
+        ref={ref}
+        value={value}
+        Icon={<UsersIcon variant="solid" size="sm" />}
+        label="Holders"
+        active={active}
+        size={size}
+        onClick={onClick}
+      />
+    );
+  },
+);
+
+const PredictNavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(
+  ({ value, active, size, onClick, item, isMobile }, ref) => {
+    if (isMobile) {
+      return (
+        <TabsTrigger
+          className="p-0 grow data-[state=active]:bg-background-transparent data-[state=active]:shadow-none"
+          value={value}
+          ref={ref}
+        >
+          <BottomTab status={active ? "active" : null} onClick={onClick}>
+            <LightbulbIcon variant="solid" size="lg" />
+          </BottomTab>
+        </TabsTrigger>
+      );
+    }
+
+    if (item) {
+      return (
+        <ArcadeMenuItem
+          ref={ref}
+          value={value}
+          Icon={<LightbulbIcon variant="solid" size="sm" />}
+          label="Predict"
+          active={active}
+          size={size}
+          onClick={onClick}
+        />
+      );
+    }
+
+    return (
+      <ArcadeTab
+        ref={ref}
+        value={value}
+        Icon={<LightbulbIcon variant="solid" size="sm" />}
+        label="Predict"
+        active={active}
+        size={size}
+        onClick={onClick}
+      />
+    );
+  },
+);
+
+const PositionsNavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(
+  ({ value, active, size, onClick, item, isMobile }, ref) => {
+    if (isMobile) {
+      return (
+        <TabsTrigger
+          className="p-0 grow data-[state=active]:bg-background-transparent data-[state=active]:shadow-none"
+          value={value}
+          ref={ref}
+        >
+          <BottomTab status={active ? "active" : null} onClick={onClick}>
+            <LightbulbIcon variant="solid" size="lg" />
+          </BottomTab>
+        </TabsTrigger>
+      );
+    }
+
+    if (item) {
+      return (
+        <ArcadeMenuItem
+          ref={ref}
+          value={value}
+          Icon={<LightbulbIcon variant="solid" size="sm" />}
+          label="Positions"
+          active={active}
+          size={size}
+          onClick={onClick}
+        />
+      );
+    }
+
+    return (
+      <ArcadeTab
+        ref={ref}
+        value={value}
+        Icon={<LightbulbIcon variant="solid" size="sm" />}
+        label="Positions"
+        active={active}
+        size={size}
+        onClick={onClick}
+      />
+    );
+  },
+);
 
 export default ArcadeTabs;

@@ -11,7 +11,7 @@ export const ArcadeHeader = ({
   onClick,
   ...props
 }: ArcadeHeaderProps) => {
-  const isMobile = useDevice();
+  const { isMobile } = useDevice();
 
   return (
     <div

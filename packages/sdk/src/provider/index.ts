@@ -7,7 +7,7 @@
 import { DojoProvider } from "@dojoengine/core";
 import * as torii from "@dojoengine/torii-client";
 import EventEmitter from "eventemitter3";
-import { Account, AccountInterface, AllowArray, Call, constants } from "starknet";
+import { Account, AccountInterface, AllowArray, Call, constants, GetTransactionReceiptResponse } from "starknet";
 import { NAMESPACE } from "../constants";
 import { TransactionType } from "./types";
 import { Social } from "./social";
@@ -83,7 +83,6 @@ export class ArcadeProvider extends DojoEmitterProvider {
   getToriiClient(toriiUrl: string): torii.ToriiClient {
     const toriiClient = new torii.ToriiClient({
       toriiUrl: toriiUrl,
-      relayUrl: "",
       worldAddress: this.manifest.world.address,
     });
     return toriiClient;
@@ -96,7 +95,7 @@ export class ArcadeProvider extends DojoEmitterProvider {
    * @returns Transaction receipt
    * @throws Error if transaction fails or is reverted
    */
-  async process(transactionHash: string) {
+  async process(transactionHash: string): Promise<GetTransactionReceiptResponse> {
     let receipt;
     try {
       receipt = await this.provider.waitForTransaction(transactionHash, {
@@ -108,8 +107,8 @@ export class ArcadeProvider extends DojoEmitterProvider {
     }
     // Check if the transaction was reverted and throw an error if it was
     if (receipt.isReverted()) {
-      this.emit("FAILED", `Transaction failed with reason: ${receipt.revert_reason}`);
-      throw new Error(`Transaction failed with reason: ${receipt.revert_reason}`);
+      this.emit("FAILED", `Transaction failed with reason: ${receipt.value.revert_reason}`);
+      throw new Error(`Transaction failed with reason: ${receipt.value.revert_reason}`);
     }
     return receipt;
   }
@@ -121,7 +120,11 @@ export class ArcadeProvider extends DojoEmitterProvider {
    * @param transactionDetails - Transaction call data
    * @returns Transaction receipt
    */
-  async invoke(signer: Account | AccountInterface, calls: AllowArray<Call>, entrypoint: string) {
+  async invoke(
+    signer: Account | AccountInterface,
+    calls: AllowArray<Call>,
+    entrypoint: string,
+  ): Promise<GetTransactionReceiptResponse> {
     const tx = await this.execute(signer, calls, NAMESPACE);
     const receipt = await this.process(tx.transaction_hash);
     this.emit("COMPLETED", {
